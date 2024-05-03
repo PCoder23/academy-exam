@@ -5,10 +5,8 @@ const Exams = () => {
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.ctrlKey && e.shiftKey && e.key === 'I') {
-              // Display a message or perform another action to indicate developer tools are disabled
-              e.preventDefault(); // Prevent browser default behavior
               alert('Developer tools are disabled');
-              return false; // Prevent further propagation of the event
+              return false; 
             }
           };
       
