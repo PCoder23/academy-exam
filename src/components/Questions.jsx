@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState,useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import QuestionNavigator from "./QuestionNavigator";
+import * as faceapi from "face-api.js";
 
 const Questions = () => {
+  const videoRef = useRef(null);
   const [cameraPermission, setCameraPermission] = useState(false);
   const [voicePermission, setVoicePermission] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
@@ -114,6 +116,44 @@ const Questions = () => {
     }
   }, [showCamera]);
 
+  useEffect(() => {
+    async function detectFaces() {
+      console.log("Loading models");
+      await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+      await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+      await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+      console.log("Detecting faces");
+      // check the number of faces in the video stream and alert if more than one face is detected or if no face detected in the video stream
+      const video = videoRef.current;
+      if (video === null) return;
+      const canvas = faceapi.createCanvas(video);
+      document.body.append(canvas);
+      const displaySize = { width: video.width, height: video.height };
+      faceapi.matchDimensions(canvas, displaySize);
+      setInterval(async () => {
+        console.log("Checking faces");
+        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+        console.log(detections);
+        if (detections.length === 0) {
+          alert("No face detected in the video stream");
+        } else if (detections.length > 1) {
+          alert("More than one face detected in the video stream");
+        }else{
+          console.log(detections.length);
+        }
+        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+        canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+        faceapi.draw.drawDetections(canvas, resizedDetections);
+        faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+      }, 3000);
+
+      
+    }
+    if (showCamera && videoRef.current !== null && !videoError){
+      detectFaces();
+    }
+  }, [showCamera]);
+
   return (
     <>
       <div className="flex gap-20 w-screen min-h-screen text-black bg-white no-select pr-40">
@@ -205,6 +245,7 @@ const Questions = () => {
               onError={(e) => {
                 setVideoError(e.target.error);
               }}
+              ref={videoRef}
             ></video>
           </div>
         </div>
