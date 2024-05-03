@@ -1,4 +1,5 @@
-import {useEffect,useState} from 'react'
+import { useEffect, useState } from "react";
+import Instruction from "./Instruction";
 
 const Exams = () => {
 
@@ -12,49 +13,47 @@ const Exams = () => {
       
           document.addEventListener('keydown', handleKeyDown);
 
-        const noSelectElements =
-            document.querySelectorAll(".no-select");
-        noSelectElements.forEach((element) => {
-            element.style.webkitUserSelect = "none";
-            element.style.mozUserSelect = "none";
-            element.style.msUserSelect = "none";
-            element.style.userSelect = "none";
-        });
-        const handleVisibilityChange = () => {
-            console.log("Visibility changed to", document.visibilityState);
-            if (document.hidden) {
-              alert("You are not allowed to switch tabs during the exam");    
-            }
-        };
-    
-        document.addEventListener("visibilitychange", handleVisibilityChange);
-    
-        return () => {
-          document.removeEventListener("visibilitychange", handleVisibilityChange);
-          document.removeEventListener('keydown', handleKeyDown);
-        };
-      }, []);
+    const noSelectElements = document.querySelectorAll(".no-select");
+    noSelectElements.forEach((element) => {
+      element.style.webkitUserSelect = "none";
+      element.style.mozUserSelect = "none";
+      element.style.msUserSelect = "none";
+      element.style.userSelect = "none";
+    });
+    const handleVisibilityChange = () => {
+      console.log("Visibility changed to", document.visibilityState);
+      if (document.hidden) {
+        alert("You are not allowed to switch tabs during the exam");
+      }
+    };
 
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    const handleContextMenu = (e) => {
-        e.preventDefault()
-        alert('Right click not allowed')
-    }
-    const handleCopyPaste = (e) => {
-        e.preventDefault()
-        alert('Copy-Paste not allowed')
-    }
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+    alert("Right click not allowed");
+  };
+  const handleCopyPaste = (e) => {
+    e.preventDefault();
+    alert("Copy-Paste not allowed");
+  };
 
   return (
-    <div 
-    onContextMenu={handleContextMenu} 
-    onCopy={handleCopyPaste}
-    onCut={handleCopyPaste} 
-    onSelect={handleCopyPaste}
-    className='w-screen h-screen bg-slate-600 no-select'>
-        Exams
+    <div
+      onContextMenu={handleContextMenu}
+      onCopy={handleCopyPaste}
+      onCut={handleCopyPaste}
+      onSelect={handleCopyPaste}
+    >
+      <Instruction />
     </div>
-  )
-}
+  );
+};
 
-export default Exams
+export default Exams;
